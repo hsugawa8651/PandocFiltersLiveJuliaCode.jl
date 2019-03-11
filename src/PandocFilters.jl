@@ -16,41 +16,47 @@ using JSON
 """
 Type representing Pandoc elements.
 """
-struct PandocElement
-  t::AbstractString
-  c::Union{AbstractString,Array,Dict}
-end
+abstract type PandocElement end
+
 
 """
 Function walk will walk `Pandoc` document abstract source tree (AST) and apply filter function on each elemnet of the document AST.
 Returns a modified tree.
 """
 
-function walk(x :: Any, action :: Function)
+function walk(x :: Any, action :: Function, format, meta)
     return x
 end
 
-function walk(x :: Array, action :: Function)
+function walk(x :: AbstractArray, action :: Function, format, meta)
   array = []
-    for item in x
-      if (typeof(item)<:Dict) && haskey(item,"t")
-        res = action(item["t"], item["c"])
-        if res == nothing
-          append!(array, [walk(item, action)])
-        elseif typeof(res)<:Array
-          append!(array, walk(res, action))
-        else
-          append!(array, [walk(res, action)])
+  w(z) = walk(z, action, format, meta)
+  for item in x
+    if (item isa AbstractDict) && haskey(item,"t")
+      res = action(item["t"], get(item, "c", nothing), format, meta)
+      if res === nothing
+        push!(array, w(item))
+      elseif res isa AbstractArray
+        for z in res
+          push!(array, w(z))
         end
       else
-        append!(array, [walk(item, action)])
-      end #if
-    end #for
+        push!(array, w(res))
+      end
+    else
+      push!(array, w(item))
+    end #if
+  end #for
   return array
 end
 
-function walk(dict :: Dict, action :: Function)
-    Dict(key=>walk(value,action) for (key,value) in dict)
+function walk(dict :: AbstractDict, action :: Function, format, meta)
+  # Python version (mutating):
+  # for k in keys(dict)
+  #   dict[k] = walk(dict[k], action, format, meta)
+  # end
+  # return dict
+  Dict(key=>walk(value,action, format, meta) for (key,value) in dict)
 end
 
 """
@@ -76,9 +82,16 @@ end
 function filter(actions::Array{Function})
   doc = JSON.parse(STDIN)
   format = (length(ARGS) <= 0) ? "" : ARGS[1]
-  meta = doc[1]["unMeta"]
+  if "meta" in doc
+    meta = doc["meta"]
+  elseif doc isa AbstractArray  # old API
+    meta = doc[1]["test"]
+  else
+    meta = Dict()
+  end
+
   for action in actions
-    doc = walk(doc, (t,c)->action(t,c,format,meta))
+    doc = walk(doc, action, format, meta)
   end
   JSON.print(STDOUT, doc)
 end
@@ -137,5 +150,5 @@ Link = elt("Link", 3)
 Image = elt("Image", 3)
 Note = elt("Note", 1)
 SoftBreak = elt("SoftBreak", 0)
-
+Span = elt("Span", 2)
 end # module
