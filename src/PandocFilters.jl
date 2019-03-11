@@ -16,8 +16,8 @@ using JSON
 """
 Type representing Pandoc elements.
 """
-type PandocElement
-  t::ASCIIString
+struct PandocElement
+  t::AbstractString
   c::Union{AbstractString,Array,Dict}
 end
 
@@ -50,7 +50,7 @@ function walk(x :: Array, action :: Function)
 end
 
 function walk(dict :: Dict, action :: Function)
-    [key=>walk(value,action) for (key,value) in dict]
+    Dict(key=>walk(value,action) for (key,value) in dict)
 end
 
 """
@@ -75,7 +75,7 @@ end
 
 function filter(actions::Array{Function})
   doc = JSON.parse(STDIN)
-  format = (length(ARGS) <= 0)? "" : ARGS[1]
+  format = (length(ARGS) <= 0) ? "" : ARGS[1]
   meta = doc[1]["unMeta"]
   for action in actions
     doc = walk(doc, (t,c)->action(t,c,format,meta))

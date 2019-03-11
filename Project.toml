@@ -1,0 +1,13 @@
+name = "PandocFilters"
+uuid = "5c63c41c-4435-11e9-15bb-bd4d9305eea5"
+authors = ["ephhome <5846501+ericphanson@users.noreply.github.com>"]
+version = "0.1.0"
+
+[deps]
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
