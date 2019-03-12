@@ -13,11 +13,6 @@ export walk, toJSONFilter
 
 using JSON
 
-"""
-Type representing Pandoc elements.
-"""
-abstract type PandocElement end
-
 
 """
 Function walk will walk `Pandoc` document abstract source tree (AST) and apply filter function on each elemnet of the document AST.
@@ -101,10 +96,10 @@ function elt(eltType, numargs)
     function fun(args...)
         lenargs = length(args)
         if lenargs != numargs
-            error("$eltType expects $numargs arguments, but given $lenargs")
+            throw(ArgumentError("$eltType expects $numargs arguments, but given $lenargs"))
         end
         if numargs == 0
-            xs = []
+            return Dict("t" => eltType)
         elseif numargs == 1
             xs = args[1]
         else
@@ -116,39 +111,41 @@ function elt(eltType, numargs)
 end
 # Constructors for block elements
 
-Plain = elt("Plain", 1)
-Para = elt("Para", 1)
-CodeBlock = elt("CodeBlock", 2)
-RawBlock = elt("RawBlock", 2)
-BlockQuote = elt("BlockQuote", 1)
-OrderedList = elt("OrderedList", 2)
-BulletList = elt("BulletList", 1)
-DefinitionList = elt("DefinitionList", 1)
-Header = elt("Header", 3)
-HorizontalRule = elt("HorizontalRule", 0)
-Table = elt("Table", 5)
-Div = elt("Div", 2)
-Null = elt("Null", 0)
+
+const Plain = elt("Plain", 1)
+const Para = elt("Para", 1)
+const CodeBlock = elt("CodeBlock", 2)
+const RawBlock = elt("RawBlock", 2)
+const BlockQuote = elt("BlockQuote", 1)
+const OrderedList = elt("OrderedList", 2)
+const BulletList = elt("BulletList", 1)
+const DefinitionList = elt("DefinitionList", 1)
+const Header = elt("Header", 3)
+const HorizontalRule = elt("HorizontalRule", 0)
+const Table = elt("Table", 5)
+const Div = elt("Div", 2)
+const Null = elt("Null", 0)
 
 # Constructors for inline elements
 
-Str = elt("Str", 1)
-Emph = elt("Emph", 1)
-Strong = elt("Strong", 1)
-Strikeout = elt("Strikeout", 1)
-Superscript = elt("Superscript", 1)
-Subscript = elt("Subscript", 1)
-SmallCaps = elt("SmallCaps", 1)
-Quoted = elt("Quoted", 2)
-Cite = elt("Cite", 2)
-Code = elt("Code", 2)
-Space = elt("Space", 0)
-LineBreak = elt("LineBreak", 0)
-Math = elt("Math", 2)
-RawInline = elt("RawInline", 2)
-Link = elt("Link", 3)
-Image = elt("Image", 3)
-Note = elt("Note", 1)
-SoftBreak = elt("SoftBreak", 0)
-Span = elt("Span", 2)
+const Str = elt("Str", 1)
+const Emph = elt("Emph", 1)
+const Strong = elt("Strong", 1)
+const Strikeout = elt("Strikeout", 1)
+const Superscript = elt("Superscript", 1)
+const Subscript = elt("Subscript", 1)
+const SmallCaps = elt("SmallCaps", 1)
+const Quoted = elt("Quoted", 2)
+const Cite = elt("Cite", 2)
+const Code = elt("Code", 2)
+const Space = elt("Space", 0)
+const LineBreak = elt("LineBreak", 0)
+const Math = elt("Math", 2)
+const RawInline = elt("RawInline", 2)
+const Link = elt("Link", 3)
+const Image = elt("Image", 3)
+const Note = elt("Note", 1)
+const SoftBreak = elt("SoftBreak", 0)
+const Span = elt("Span", 2)
+
 end # module

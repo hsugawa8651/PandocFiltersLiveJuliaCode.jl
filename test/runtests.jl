@@ -1,8 +1,32 @@
-using PandocFilters: walk, Plain, Null, Code, Str
-using Test, JSON
+using PandocFilters: walk, Plain, Null, Code, Str, Space
+using Test, JSON, BenchmarkTools
 import PandocFilters
 
 PandocFilters.walk(x,y) =walk(x,y, "", Dict{String,Any}())
+
+const manual_str = open("MANUAL.JSON", "r") do f
+  read(f, String)
+end;
+
+@testset "Timing" begin
+      f = () -> begin
+         j_manual = JSON.parse(manual_str);
+         doc_out = walk(j_manual, (t,c,m,f) -> nothing)
+       doc_out
+       end
+
+       @btime $f();
+  end
+
+@testset "Manual roundtrip" begin
+
+  j_manual = JSON.parse(manual_str);
+  doc_in = copy(j_manual)
+  doc_out = walk(j_manual, (t,c,m,f) -> nothing)
+
+  @test doc_out == j_manual == doc_in
+end
+
 
 @testset "JSON" begin
   para = JSON.parse(raw"""{
@@ -28,6 +52,10 @@ PandocFilters.walk(x,y) =walk(x,y, "", Dict{String,Any}())
 
   j_no_space = raw"""{"c":[{"c":"Brief","t":"Str"},{"c":"mathematical","t":"Str"}],"t":"Para"}"""
   @test j_no_space == j_test_no_space
+
+
+  # j_test_double_space = JSON.json(walk(para, (t,c,f,m) -> t == "Space" ? [Space(), Space()] : nothing))
+  # println(j_test_double_space)
   
 end
 
@@ -53,7 +81,7 @@ end
 end
 @testset "Testing Pandoc elements" begin
   @test Plain("Plain text") == Dict("t"=>"Plain","c"=>"Plain text")
-  @test Null() == Dict("t"=>"Null","c"=>[])
+  @test_broken Null() == Dict("t"=>"Null","c"=>[])
   @test Code(["fun";Any[[],[]]],"1+1") ==  Dict("t"=>"Code","c"=>Any[["fun"; Any[[],[]]],"1+1"])
 end
 
