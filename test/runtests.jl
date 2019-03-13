@@ -5,26 +5,19 @@ import PandocFilters
 PandocFilters.walk!(x,y) = walk!(x, y, "", Dict{String,Any}())
 PandocFilters.walk!(x) = walk!(x, (t,c,m,f) -> nothing)
 
-const manual_str = open("MANUAL.JSON", "r") do f
-  read(f, String)
-end;
 
-@testset "Timing" begin
-      f = () -> begin
-         j_manual = JSON.parse(manual_str);
-         doc_out = walk!(j_manual)
-       doc_out
-       end
 
-       @btime $f();
-  end
 
 @testset "Manual roundtrip" begin
-
+ manual_str = open("MANUAL.JSON", "r") do f
+    read(f, String)
+  end;
   j_manual = JSON.parse(manual_str);
+
   doc_out = walk!(j_manual, (t,c,m,f) -> nothing)
 
-  @test doc_out == j_manual
+  @test doc_out == j_manual == JSON.parse(manual_str)
+  
 end
 
 
