@@ -9,54 +9,62 @@ AST serialized as JSON.
 """
 module PandocFilters
 
-export walk, toJSONFilter
+export walk!, toJSONFilter
 
 using JSON
 
 
 """
-Function walk will walk `Pandoc` document abstract source tree (AST) and apply filter function on each elemnet of the document AST.
+Function walk! will walk! `Pandoc` document abstract source tree (AST) and apply filter function on each element of the document AST.
 Returns a modified tree.
+
+  action must be a function which takes four arguments, `tag, content, format, meta`,
+  and should return
+  
+  * `nothing` to leave the element unchanged
+  * `[]` to delete the element
+  * A Pandoc element to replace the element
+  * or a list of Pandoc elements which will be spliced into the list the original object belongs to.
 """
 
-function walk(x :: Any, action :: Function, format, meta)
+function walk!(x :: Any, action :: Function, format, meta)
     return x
 end
 
-function walk(x :: AbstractArray, action :: Function, format, meta)
+function walk!(x :: AbstractArray, action :: Function, format, meta)
   array = []
-  w(z) = walk(z, action, format, meta)
+  w!(z) = walk!(z, action, format, meta)
   for item in x
     if (item isa AbstractDict) && haskey(item,"t")
       res = action(item["t"], get(item, "c", nothing), format, meta)
       if res === nothing
-        push!(array, w(item))
+        push!(array, w!(item))
       elseif res isa AbstractArray
         for z in res
-          push!(array, w(z))
+          push!(array, w!(z))
         end
       else
-        push!(array, w(res))
+        push!(array, w!(res))
       end
     else
-      push!(array, w(item))
+      push!(array, w!(item))
     end #if
   end #for
   return array
 end
 
-function walk(dict :: AbstractDict, action :: Function, format, meta)
+function walk!(dict :: AbstractDict, action :: Function, format, meta)
   # Python version (mutating):
-  # for k in keys(dict)
-  #   dict[k] = walk(dict[k], action, format, meta)
-  # end
-  # return dict
-  Dict(key=>walk(value,action, format, meta) for (key,value) in dict)
+  for k in keys(dict)
+    dict[k] = walk!(dict[k], action, format, meta)
+  end
+  return dict
+  # Dict(key => walk!(value,action, format, meta) for (key,value) in dict)
 end
 
 """
 Converts an action or a list of actions into a filter that reads a JSON-formatted
-pandoc document from stdin, transforms it by walking the tree
+pandoc document from stdin, transforms it by walk!ing the tree
 with the actions, and returns a new JSON-formatted pandoc document
 to stdout.  The argument is a list of functions action(key, value, format, meta),
 where key is the type of the pandoc object (e.g. "Str", "Para"),
@@ -86,7 +94,7 @@ function filter(actions::Array{Function})
   end
 
   for action in actions
-    doc = walk(doc, action, format, meta)
+    doc = walk!(doc, action, format, meta)
   end
   JSON.print(STDOUT, doc)
 end
