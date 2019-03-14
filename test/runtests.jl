@@ -30,13 +30,15 @@ end
 
   # Test the json was unchanged
   @test j_para == j_test_no_change
-  j_test_no_space = JSON.json(walk!(para, (t,c,f,m) -> t == "Space" ? [] : nothing))
+  out = walk!(para, (t,c,f,m) -> t == "Space" ? [] : nothing)
+  j_test_no_space = JSON.json(out)
 
   @test j_test_no_space == raw"""{"c":[{"c":"Brief","t":"Str"},{"c":"mathematical","t":"Str"}],"t":"Para"}"""
 
   # Check para was mutated
   @test para != p_in
-
+  @test para == out
+  
   # Try doubling the spaces
   j_test_double_space = JSON.json(walk!(p_in, (t,c,f,m) -> t == "Space" ? [Space(), Space()] : nothing))
   @test j_test_double_space == raw"""{"c":[{"c":"Brief","t":"Str"},{"t":"Space"},{"t":"Space"},{"c":"mathematical","t":"Str"}],"t":"Para"}"""
