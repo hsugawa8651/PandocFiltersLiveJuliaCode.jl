@@ -9,7 +9,7 @@ AST serialized as JSON.
 """
 module PandocFilters
 
-export walk!, toJSONFilter
+export walk!, toJSONFilter, AST_filter!
 
 using JSON
 
@@ -97,6 +97,24 @@ function filter(actions::Array{Function})
     doc = walk!(doc, action, format, meta)
   end
   JSON.print(STDOUT, doc)
+end
+
+function AST_filter!(doc, action; format = "")
+  AST_filter!(doc, [action]; format = format)
+end
+
+function AST_filter!(doc, actions::AbstractVector; format = "")
+  if haskey(doc, "meta")
+    meta = doc["meta"]
+  elseif doc isa AbstractArray  # old API
+    meta = doc[1]["test"]
+  else
+    meta = Dict()
+  end
+
+  for action in actions
+    walk!(doc, action, format, meta)
+  end
 end
 
 
