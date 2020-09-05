@@ -35,10 +35,10 @@ using JSON
 """
     walk!(a, action::Function, format, meta)
 
-Function walk! will walk! `Pandoc` document abstract source tree (AST) and apply filter function on each element of the document AST.
+Function `walk!` will `walk!` `Pandoc` document abstract source tree (AST) and apply filter function on each element of the document AST.
 Returns a modified tree.
 
-  action must be a function which takes four arguments, `tag, content, format, meta`,
+  `action` must be a function which takes four arguments, `tag, content, format, meta`,
   and should return
 
   * `nothing` to leave the element unchanged
