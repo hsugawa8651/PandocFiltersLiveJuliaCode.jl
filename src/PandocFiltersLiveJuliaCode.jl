@@ -89,7 +89,7 @@ empty list deletes the object.)
 filter(action::Function) = filter([action])
 
 function filter(actions::Vector{T}) where {T<:Function}
-  doc = JSON.parse(STDIN)
+  doc = JSON.parse(stdin)
   format = (length(ARGS) <= 0) ? "" : ARGS[1]
   if "meta" in doc
     meta = doc["meta"]
@@ -102,7 +102,7 @@ function filter(actions::Vector{T}) where {T<:Function}
   for action in actions
     doc = walk!(doc, action, format, meta)
   end
-  JSON.print(STDOUT, doc)
+  JSON.print(stdout, doc)
 end
 
 function AST_filter!(doc, action; format = "")
