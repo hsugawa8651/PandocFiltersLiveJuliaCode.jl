@@ -91,7 +91,7 @@ filter(action::Function) = filter([action])
 function filter(actions::Vector{T}) where {T<:Function}
   doc = JSON.parse(stdin)
   format = (length(ARGS) <= 0) ? "" : ARGS[1]
-  if "meta" in doc
+  if isa(doc,Dict) && haskey(doc,"meta")
     meta = doc["meta"]
   elseif doc isa AbstractArray  # old API
     meta = doc[1]["test"]
