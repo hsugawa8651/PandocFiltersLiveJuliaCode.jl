@@ -85,6 +85,13 @@ function destruct_attrs(a)
 end
 
 function investigate_codeblock(t, c, format, meta)
+   function stringfy(x)
+      # isa(x, AbstractString) && return(x)
+      io=IOBuffer()
+      show(io, "text/plain", x)
+      String(take!(io))
+   end
+
    (t == "CodeBlock") || return nothing
    attrs, code=c
    id, classes, keyvals=destruct_attrs(attrs)
@@ -97,22 +104,22 @@ function investigate_codeblock(t, c, format, meta)
    attrs1[2][1]=class1
    code=remove_hide_from_code(code)
    isempty(code) && return []
-   element1=PandocFilters.CodeBlock(attrs1,code)
+   element1=CodeBlock(attrs1,code)
    result=Any[]
    push!(result, element1)
 
    if ! isempty(out_s)
-      element2=PandocFilters.CodeBlock(attrs1,out_s)
+      element2=CodeBlock(attrs1,out_s)
       push!(result, element2)
    end
    if ! isempty(err_s)
-      element3=PandocFilters.CodeBlock(attrs1,err_s)
+      element3=CodeBlock(attrs1,err_s)
       push!(result, element3)
    end
    #
    if isempty(out_s) && isempty(err_s)
       if !isnothing(res)
-         element4=PandocFilters.CodeBlock(attrs1,string(res))
+         element4=CodeBlock(attrs1,stringfy(res))
          push!(result, element4)
       end
    end
@@ -124,5 +131,5 @@ function investigate_image(t, c, format, meta)
    attr, inlines, url_title = c
    url, title = url_title
    url = replace(url, "@OUTPUT/" => "assets/")
-   PandocFilters.Image(attr, inlines, [url, title])
+   Image(attr, inlines, [url, title])
 end

@@ -1,7 +1,7 @@
 name = "PandocFiltersLiveJuliaCode"
 uuid = "f2a155ab-7813-4802-b03c-37488dc6a1bf"
 authors = ["Hiroharu Sugawara <hsugawa@gmail.com> and contributors"]
-version = "0.2.0"
+version = "0.2.2"
 
 [deps]
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
