@@ -85,6 +85,13 @@ function destruct_attrs(a)
 end
 
 function investigate_codeblock(t, c, format, meta)
+   function stringfy(x)
+      # isa(x, AbstractString) && return(x)
+      io=IOBuffer()
+      show(io, "text/plain", x)
+      String(take!(io))
+   end
+
    (t == "CodeBlock") || return nothing
    attrs, code=c
    id, classes, keyvals=destruct_attrs(attrs)
@@ -112,7 +119,7 @@ function investigate_codeblock(t, c, format, meta)
    #
    if isempty(out_s) && isempty(err_s)
       if !isnothing(res)
-         element4=CodeBlock(attrs1,string(res))
+         element4=CodeBlock(attrs1,stringfy(res))
          push!(result, element4)
       end
    end
