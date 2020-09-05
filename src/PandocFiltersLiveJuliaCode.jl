@@ -86,11 +86,9 @@ be replaced.    If it returns a list, the list will be spliced in to
 the list to which the target object belongs.    (So, returning an
 empty list deletes the object.)
 """
-function filter(action::Function)
-  filter([action])
-end
+filter(action::Function) = filter([action])
 
-function filter(actions::Array{Function})
+function filter(actions::Vector{T}) where {T<:Function}
   doc = JSON.parse(STDIN)
   format = (length(ARGS) <= 0) ? "" : ARGS[1]
   if "meta" in doc
