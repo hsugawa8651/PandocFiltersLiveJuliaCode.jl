@@ -1,10 +1,20 @@
+
+# Author: Hiroharu Sugawara <hsugawa@gmail.com>
+# Copyright: (C) 2020 Hiroharu Sugawara
+
+# Author: Eric P. Hanson
+# Copyright: (C) 2018? Eric P. Hanson
+
 # Author: Martin Vuk <martin.vuk@fri.uni-lj.si>
 # Copyright: (C) 2016 Martin Vuk
+
 # License: BSD 3-clause
 
 
 """
-Functions to aid writing python scripts that process the pandoc
+    PandocFiltersLiveJuliaCode
+
+Package to aid writing Julia scripts that process the pandoc
 AST serialized as JSON.
 """
 module PandocFiltersLiveJuliaCode
@@ -23,10 +33,12 @@ using JSON
 
 
 """
-Function walk! will walk! `Pandoc` document abstract source tree (AST) and apply filter function on each element of the document AST.
+    walk!(a, action::Function, format, meta)
+
+Function `walk!` will `walk!` `Pandoc` document abstract source tree (AST) and apply filter function on each element of the document AST.
 Returns a modified tree.
 
-  action must be a function which takes four arguments, `tag, content, format, meta`,
+  `action` must be a function which takes four arguments, `tag, content, format, meta`,
   and should return
 
   * `nothing` to leave the element unchanged
@@ -34,7 +46,6 @@ Returns a modified tree.
   * A Pandoc element to replace the element
   * or a list of Pandoc elements which will be spliced into the list the original object belongs to.
 """
-
 function walk!(x :: Any, action :: Function, format, meta)
     return x
 end
@@ -70,7 +81,11 @@ function walk!(dict :: AbstractDict, action :: Function, format, meta)
   # Dict(key => walk!(value,action, format, meta) for (key,value) in dict)
 end
 
+
 """
+    filter!(action::Function)
+    filter!(actions::Vector{Function})
+
 Converts an action or a list of actions into a filter that reads a JSON-formatted
 pandoc document from stdin, transforms it by walk!ing the tree
 with the actions, and returns a new JSON-formatted pandoc document
@@ -105,12 +120,30 @@ function filter(actions::Vector{T}) where {T<:Function}
   JSON.print(stdout, doc)
 end
 
-function AST_filter!(doc, action; format = "")
-  AST_filter!(doc, [action]; format = format)
-end
 
-function AST_filter!(doc, actions::AbstractVector; format = "")
-  if haskey(doc, "meta")
+"""
+    AST_filter!(doc, action::Function, format="")
+    AST_filter!(doc, actions::Vector{Function}, format="")
+
+Converts an action or a list of actions into a filter that reads a JSON-formatted
+pandoc document from stdin, transforms it by walk!ing the tree
+with the actions, and returns a new JSON-formatted pandoc document
+to stdout.  The argument is a list of functions action(key, value, format, meta),
+where key is the type of the pandoc object (e.g. "Str", "Para"),
+value is the contents of the object (e.g. a string for "Str",
+a list of inline elements for "Para"), format is the target
+output format (which will be taken for the first command line
+argument if present), and meta is the document's metadata.
+If the function returns None, the object to which it applies
+will remain unchanged.  If it returns an object, the object will
+be replaced.    If it returns a list, the list will be spliced in to
+the list to which the target object belongs.    (So, returning an
+empty list deletes the object.)
+"""
+AST_filter!(doc, action::Function; format = "") = AST_filter!(doc, [action], format)
+
+function AST_filter!(doc, actions::Vector{T}; format = "") where {T<:Function}
+  if isa(doc,Dict) && haskey(doc, "meta")
     meta = doc["meta"]
   elseif doc isa AbstractArray  # old API
     meta = doc[1]["test"]
