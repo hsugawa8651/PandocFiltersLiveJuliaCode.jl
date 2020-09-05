@@ -7,7 +7,7 @@
 Functions to aid writing python scripts that process the pandoc
 AST serialized as JSON.
 """
-module PandocFilters
+module PandocFiltersLiveJuliaCode
 
 export walk!, toJSONFilter, AST_filter!
 
@@ -20,7 +20,7 @@ Returns a modified tree.
 
   action must be a function which takes four arguments, `tag, content, format, meta`,
   and should return
-  
+
   * `nothing` to leave the element unchanged
   * `[]` to delete the element
   * A Pandoc element to replace the element
