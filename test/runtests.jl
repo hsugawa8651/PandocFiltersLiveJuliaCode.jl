@@ -1,15 +1,15 @@
-using PandocFilters: walk!, Plain, Null, Code, Str, Space
-using Test, JSON, BenchmarkTools
-import PandocFilters
+using PandocFiltersLiveJuliaCode: walk!, Plain, Null, Code, Str, Space
+using Test, JSON
+import PandocFiltersLiveJuliaCode
 
-PandocFilters.walk!(x,y) = walk!(x, y, "", Dict{String,Any}())
-PandocFilters.walk!(x) = walk!(x, (t,c,m,f) -> nothing)
+PandocFiltersLiveJuliaCode.walk!(x,y) = walk!(x, y, "", Dict{String,Any}())
+PandocFiltersLiveJuliaCode.walk!(x) = walk!(x, (t,c,m,f) -> nothing)
 
 
 
 
 @testset "Manual roundtrip" begin
- manual_str = open("MANUAL.JSON", "r") do f
+ manual_str = open("MANUAL.json", "r") do f
     read(f, String)
   end;
   j_manual = JSON.parse(manual_str);
@@ -17,7 +17,7 @@ PandocFilters.walk!(x) = walk!(x, (t,c,m,f) -> nothing)
   doc_out = walk!(j_manual, (t,c,m,f) -> nothing)
 
   @test doc_out == j_manual == JSON.parse(manual_str)
-  
+
 end
 
 
@@ -38,11 +38,11 @@ end
   # Check para was mutated
   @test para != p_in
   @test para == out
-  
+
   # Try doubling the spaces
   j_test_double_space = JSON.json(walk!(p_in, (t,c,f,m) -> t == "Space" ? [Space(), Space()] : nothing))
   @test j_test_double_space == raw"""{"c":[{"c":"Brief","t":"Str"},{"t":"Space"},{"t":"Space"},{"c":"mathematical","t":"Str"}],"t":"Para"}"""
-  
+
 end
 
 
