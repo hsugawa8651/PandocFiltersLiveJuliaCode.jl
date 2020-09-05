@@ -1,13 +1,11 @@
 #!/usr/bin/env julia
 
-"""
-Pandoc filter to convert all regular text to uppercase.
-Code, link URLs, etc. are not affected.
-"""
+# Pandoc filter to convert all regular text to uppercase.
+# Code, link URLs, etc. are not affected.
 
 using PandocFiltersLiveJuliaCode
 
-function caps(t,v,format, meta)
+function caps(t, v, format, meta)
    (t == "Str") || return nothing
    return Str(uppercase(v))
 end
