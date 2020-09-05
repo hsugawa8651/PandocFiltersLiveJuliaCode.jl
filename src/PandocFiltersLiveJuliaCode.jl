@@ -22,5 +22,6 @@ module PandocFiltersLiveJuliaCode
 using JSON
 
 include("./PandocFilters.jl")
+include("./PandocLiveJuliaCodeFilter.jl")
 
 end # module
