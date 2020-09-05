@@ -11,6 +11,14 @@ module PandocFiltersLiveJuliaCode
 
 export walk!, toJSONFilter, AST_filter!
 
+export Plain, Para, CodeBlock, RawBlock, BlockQuote
+export OrderedList, BulletList, DefinitionList
+export Header, HorizontalRule, Table, Div, Null
+
+export Str, Emph, Strong, Strikeout, Superscript, Subscript, SmallCaps
+export Quoted, Cite, Code, Space, LineBreak, Math, RawInline
+export Link, Image, Note, SoftBreak, Span
+
 using JSON
 
 
