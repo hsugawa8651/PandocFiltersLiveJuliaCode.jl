@@ -11,13 +11,7 @@
 # License: BSD 3-clause
 
 
-"""
-    PandocFiltersLiveJuliaCode
-
-Package to aid writing Julia scripts that process the pandoc
-AST serialized as JSON.
-"""
-module PandocFiltersLiveJuliaCode
+# PandocFIlters.jl
 
 export walk!, toJSONFilter, AST_filter!
 
@@ -28,8 +22,6 @@ export Header, HorizontalRule, Table, Div, Null
 export Str, Emph, Strong, Strikeout, Superscript, Subscript, SmallCaps
 export Quoted, Cite, Code, Space, LineBreak, Math, RawInline
 export Link, Image, Note, SoftBreak, Span
-
-using JSON
 
 
 """
@@ -213,4 +205,4 @@ const Note = elt("Note", 1)
 const SoftBreak = elt("SoftBreak", 0)
 const Span = elt("Span", 2)
 
-end # module
+# EOF
